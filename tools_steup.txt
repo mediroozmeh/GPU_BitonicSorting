@@ -1,0 +1,5 @@
+export PATH=/home/mehdi/work/MPI/bin:$PATH
+export PATH=/home/mehdi/Tools/scorep/bin:$PATH
+export PATH=/home/mehdi/work/otf2/bin:$PATH
+export PATH=/home/mehdi/work/opari/bin:$PATH
+export PATH=/home/mehdi/vampir-9.5/bin:$PATH
