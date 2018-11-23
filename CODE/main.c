@@ -38,6 +38,7 @@ int main(int argc, char** argv) {
     cl_int err; 
     char *source_str;
     size_t source_size;
+    size_t preferred_groupsize;
           
     char *kernelsource;
     char filename[]="BitonicSort.cl";
@@ -108,13 +109,8 @@ int main(int argc, char** argv) {
      }
 
 
-clGetDeviceInfo (device_id , CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxWorkGroup), &maxWorkGroup , NULL);
-
-     
+clGetDeviceInfo (device_id , CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxWorkGroup), &maxWorkGroup , NULL);     
      fprintf(fp,"\nMaximum allowed work group size: %d\n", maxWorkGroup);
-
-
-
 
 
     /////////// Device OpenCL version//
@@ -207,7 +203,6 @@ clGetDeviceInfo (device_id , CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxWorkGroup)
      clEnqueueUnmapMemObject(command_queue, a_mem_pinned, A, 0, NULL, NULL);
      clEnqueueUnmapMemObject(command_queue, b_mem_pinned, B, 0, NULL, NULL);
     
-    
   #else
   
     // Copy the lists A and B to their respective memory buffers
@@ -215,8 +210,6 @@ clGetDeviceInfo (device_id , CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxWorkGroup)
             DATA_SIZE * sizeof(unsigned int), A, 0, NULL, NULL);
     ret = clEnqueueWriteBuffer(command_queue, b_mem_obj, CL_TRUE, 0, 
             DATA_SIZE * sizeof(unsigned int), B, 0, NULL, NULL);
-
-
  #endif
 
 
@@ -251,8 +244,16 @@ clGetDeviceInfo (device_id , CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxWorkGroup)
        cl_kernel mergeLocalKernel = clCreateKernel(program, "bitonicMergeLocal", &err); 
           if(sortlocal_kernel == NULL)
        print_error("Creating KERNEL IS FAILED", __LINE__);
-
+/////////
         
+	   
+  ret=clGetKernelWorkGroupInfo (sortlocal_kernel,device_id,CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,sizeof( preferred_groupsize), &preferred_groupsize,NULL);
+     if(ret != CL_SUCCESS)
+  print_error("CL GetkernelWorkGroup info is failed", __LINE__);
+    fprintf(fp,"The preferred group size is:%d\n ",  preferred_groupsize);
+    
+
+
     // Set the arguments of the kernel
     //
     #ifdef PINNED
