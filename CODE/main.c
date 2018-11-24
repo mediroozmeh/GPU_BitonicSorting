@@ -43,17 +43,28 @@ int main(int argc, char** argv) {
     char *kernelsource;
     char filename[]="BitonicSort.cl";
 
+   
+  
+
 
         FILE *fp;
         fp = fopen("output.txt","w"); 
 
+         #ifdef options
+	   char options[]="-cl-mad-enable -cl-fast-relaxed-math";
+	   fprintf(fp,"The compiler options is enabled for clbuild ");
+         #else
+	    char options[]="";
+	 #endif	
+	   
+
 
        #ifdef OPTIMIZED
-          fprintf(fp,"The level 0 optimization is enabled from make file :OO1,OO2,PP \n");
+    fprintf(fp,"The level 0 optimization is enabled from make file :OO1,OO2,PP \n");
        #endif
      
 
-     fprintf(fp,"GLOBAL SIZE:%d , LOCAL SIZE:%d, Total WORK GROUP %d\n", DATA_SIZE, LOCAL_SIZE, DATA_SIZE/LOCAL_SIZE);
+     fprintf(fp,"GLOBAL SIZE:%d , LOCAL SIZE:%d, Total WORK GROUP %d\n", DATA_SIZE, LOCAL_SIZE/2, DATA_SIZE/LOCAL_SIZE);
 
        
 
@@ -223,7 +234,7 @@ clGetDeviceInfo (device_id , CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxWorkGroup)
 
 
     // Build the program
-    ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+    ret = clBuildProgram(program, 1, &device_id, &options, NULL, NULL);
      if(ret != CL_SUCCESS)
       print_error("Program Compilation is Failed", __LINE__);
      
@@ -247,11 +258,10 @@ clGetDeviceInfo (device_id , CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxWorkGroup)
 /////////
         
 	   
-  ret=clGetKernelWorkGroupInfo (sortlocal_kernel,device_id,CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,sizeof( preferred_groupsize), &preferred_groupsize,NULL);
+  ret=clGetKernelWorkGroupInfo (sortlocal_kernel,device_id,CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE ,sizeof( preferred_groupsize), &preferred_groupsize,NULL);
      if(ret != CL_SUCCESS)
-  print_error("CL GetkernelWorkGroup info is failed", __LINE__);
+  print_error("GetkernelWorkGroup info is failed", __LINE__);
     fprintf(fp,"The preferred group size is:%d\n ",  preferred_groupsize);
-    
 
 
     // Set the arguments of the kernel
