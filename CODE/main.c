@@ -138,15 +138,14 @@ clGetDeviceInfo (device_id , CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxWorkGroup)
      //#Region 2: Context and Command Creation  
 
     // Create an OpenCL context
-    cl_context context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
-    if(context == NULL)
+    cl_context context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &err);
+    if(err != CL_SUCCESS)
      print_error( "Failed to create context", __LINE__);
 
 
-
     // Create a command queue
-    cl_command_queue command_queue = clCreateCommandQueue(context, device_id,  0 , &ret);
-    if(command_queue == NULL)
+    cl_command_queue command_queue = clCreateCommandQueue(context, device_id,  0 , &err);
+    if(err != CL_SUCCESS)
      print_error("Failed to create command queue", __LINE__);
 
          
@@ -229,13 +228,13 @@ clGetDeviceInfo (device_id , CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxWorkGroup)
      load_file_to_memory(filename, &kernelsource);
 
       cl_program  program = clCreateProgramWithSource(context, 1, (const char **) &kernelsource, NULL, &err);
-           if(program == NULL)
+           if(err != CL_SUCCESS)
 	    print_error("Program sourcing is Failed", __LINE__);
 
 
     // Build the program
-    ret = clBuildProgram(program, 1, &device_id, &options, NULL, NULL);
-     if(ret != CL_SUCCESS)
+    ret = clBuildProgram(program, 1, &device_id, &options, NULL, err);
+     if(err != CL_SUCCESS)
       print_error("Program Compilation is Failed", __LINE__);
      
 
@@ -353,10 +352,15 @@ unsigned int total = 0;
                 err |= clSetKernelArg(mergeLocalKernel, 6, sizeof(cl_uint), &size); 
                 err |= clSetKernelArg(mergeLocalKernel, 7, sizeof(cl_uint), &dir); 
                  #endif	
+                if(err!=CL_SUCCESS)
+           print_error("MergeGlobal is failed", __LINE__);
 
           //          printf("starting kernel MergeLocal  %2d out of %d (size %4u stride %4u)\n", run, total, size, stride); 
                     err |= clEnqueueNDRangeKernel(command_queue, mergeLocalKernel, 1, NULL, (size_t *)&global,(size_t *) &local, 0, NULL, NULL); 
-                 
+                   if(err!=CL_SUCCESS)
+           print_error("MergeLocal is failed", __LINE__);
+            
+
                 }
 		err |= clFinish(command_queue);
             }
@@ -378,7 +382,11 @@ unsigned int total = 0;
             DATA_SIZE * sizeof(unsigned int), C, 0, NULL, NULL);
      ret |= clEnqueueReadBuffer(command_queue, d_mem_obj, CL_TRUE, 0, 
             DATA_SIZE * sizeof(unsigned int), D, 0, NULL, NULL);
-         
+      if(ret != CL_SUCCESS)
+           print_error("Unable to Read Back Buffers", __LINE__);
+        
+
+
       #endif
     
 
