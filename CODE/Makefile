@@ -1,7 +1,12 @@
 
 .PHONY = all clean 
 
+
+ifdef scorep
 CC = scorep-gcc                        # compiler to use
+else
+CC = gcc
+endif
 
 DD = -DDEBUG
 CL=-l OpenCL
