@@ -32,6 +32,7 @@
 // PRINT OUT THE ERROR MESSAGE
 print_error(char input[50], int line_number ){
 	 printf(RED "%s :#%d \n "  RESET , input ,line_number - 2);
+	 exit(0);
 
 }
 //////// Load source file 
