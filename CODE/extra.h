@@ -7,6 +7,8 @@
 
 
 
+
+
   /// Capture the elapsd time for a given event in nanosecond.// 
    
     double time_profiler(cl_event event, cl_int ret) {
